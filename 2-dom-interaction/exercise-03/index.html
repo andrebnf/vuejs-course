@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <script src="../vue.js"></script>
+  </head>
+  <body>
+    <div id="exercise">
+      <!-- 1) Show a "result" of 'not there yet' as long as "value" is not equal to 37 - you can change "value" with the buttons. Print 'done' once you did it -->
+      <div>
+        <p>Current Value: {{ value }}</p>
+        <button @click="value += 5">Add 5</button>
+        <button @click="value += 1">Add 1</button>
+        <p>{{ result }}</p>
+      </div>
+      <hr>
+      <label for="timer">Timer</label>
+      <input :value="timer" @input="changeTimer">
+      <!-- 2) Watch for changes in the "result" and reset the "value" after 5 seconds (hint: setTimeout(..., 5000) -->
+      <div>
+        <input type="text">
+        <p>{{ value }}</p>
+      </div>
+      <hr>
+      <p>{{ timer }}</p>
+    </div>
+  </body>
+
+  <script type="text/javascript">
+    new Vue({
+      el: '#exercise',
+      data: {
+        value: 0,
+        timer: 5000
+      },
+      computed: {
+        result: function() {
+          console.log('Computed');
+          return this.value > 16 ? 'Greater than 16' : 'Smaller or equal than 16';
+        }
+      },
+      watch: {
+        result: function(value) {
+          var vm = this;
+          setTimeout(function(){
+            console.log('Reset!');
+            vm.value = 0;
+          }, vm.timer);
+        }
+      },
+      methods: {
+        changeTimer(evt) {
+          this.timer = evt.target.value;
+        }
+      }
+    });
+  </script>
+
+</html>
