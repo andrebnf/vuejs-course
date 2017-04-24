@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <script src="vue.js"></script>
+
+    <style>
+      #app {
+        width: 80%;
+        margin: 0 auto;
+      }
+
+      .player-container {
+        width: 50%;
+        float: left;
+        box-sizing: border-box;
+        text-align: center;
+        padding: 1em 2em;
+      }
+
+      .health-bar--wrapper {
+        width: 100%;
+        line-height: 30px;
+        background-color: lightgray;
+        position: relative;
+      }
+
+      .health-bar--inner {
+        width: 100%;
+        background-color: green;
+        color: white;
+        transition: all .5s ease-in-out;
+      }
+
+      .controls, .logs {
+        border: 1px solid #CCC;
+        padding: 1em;
+        width: 100%;
+        text-align: center;
+      }
+
+      .controls {
+        clear: both;
+      }
+
+      .logs {
+        margin-top: 1em;
+      }
+
+      .log {
+        margin: 4px 0;
+        font-weight: bold;
+      }
+
+      .red {
+        background-color: #ffb4b4;
+        color: red;
+      }
+
+      .blue {
+        background-color: lightblue;
+        color: blue;
+      }
+
+      #btn-attack { background-color: red; }
+      #btn-special { background-color: orange; }
+      #btn-heal { background-color: lightgreen; }
+      #btn-giveup { background-color: white; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="player-container">
+        <h2>You</h2>
+        <div class="health-bar--wrapper">
+          <div class="health-bar--inner" :style="{width: playerLife + '%'}">{{ playerLife }}</div>
+        </div>
+      </div>
+      <div class="player-container">
+        <h2>Monster</h2>
+        <div class="health-bar--wrapper">
+          <div class="health-bar--inner" :style="{width: monsterLife + '%'}">{{ monsterLife }}</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div v-if="state === 'stopped'">
+          <button @click="startGame">Start new game</button>
+        </div>
+        <div v-else>
+          <button id="btn-attack" @click="attack">Attack</button>
+          <button id="btn-special" @click="specialAttack">Special Attack</button>
+          <button id="btn-heal" @click="heal">Heal</button>
+          <button id="btn-giveup" @click="giveUp">Give up</button>
+        </div>
+      </div>
+      <div class="logs">
+        <div class="log" v-for="log in logs">
+          <div :class="log.class">{{ log.message }}</div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script type="text/javascript">
+    new Vue({
+      el: '#app',
+      data: {
+        playerLife: 100,
+        monsterLife: 100,
+        state: 'stopped',
+        logs: [] // [{ message: 'Monster hits player for 6' , color: 'red' }, ...]
+      },
+      methods: {
+        startGame: function() {
+          this.state = 'playing';
+        },
+        attack: function() {
+          var playerPower = random(7, 15),
+            monsterPower = random(4, 10);
+
+          this.monsterLife = this.monsterLife - playerPower;
+          this.playerLife = this.playerLife - monsterPower;
+          this.logs.push({message: 'Player hits Monster for ' + playerPower, class: 'blue'})
+          this.logs.push({message: 'Monster hits Player for ' + monsterPower, class: 'red'})
+        },
+        specialAttack: function() {
+          var playerPower = random(10, 20),
+            monsterPower = random(4, 10);
+
+          this.monsterLife = this.monsterLife - playerPower;
+          this.playerLife = this.playerLife - monsterPower;
+          this.logs.push({message: 'Player hits Monster for ' + playerPower, class: 'blue'})
+          this.logs.push({message: 'Monster hits Player for ' + monsterPower, class: 'red'})
+        },
+        heal: function() {
+          var monsterPower = random(4, 10);
+          this.logs.push({message: 'Player heals himself for 10', class: 'blue'});
+          this.playerLife = Math.min(this.playerLife - monsterPower + 10, 100);
+          this.logs.push({message: 'Monster hits Player for ' + monsterPower, class: 'red'})
+        },
+        giveUp: function() {
+
+        }
+      }
+    });
+
+    function random(min, max) {
+      return ~~(Math.random() * (max - min + 1) + min);
+    }
+  </script>
+
+</html>
