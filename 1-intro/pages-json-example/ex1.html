@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <script src="../vue.js"></script>
+    <script src="json1.js"></script>
+    <script src="json2.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="wrapper" :class="myClass">
+        <h1>{{ pages.lp2.title }} {{ age }}</h1>
+        <p>{{ pages.lp2.content }}</p>
+
+        <img v-if="pages.lp2.imageURL" v-bind:src="pages.lp2.imageURL" alt="">
+        <div v-else>Não tem ibagens :(</div>
+
+        <ul>
+          <li v-for="n in list">{{ n }}</li>
+        </ul>
+      </div>
+
+    </div>
+  </body>
+
+  <script type="text/javascript">
+    new Vue({
+      el: '#app',
+      data: {
+        myClass: 'vivoLP',
+        pages: {
+          lp1: window.json1,
+          lp2: window.json2
+        },
+        list: [1, 2, 3, 4, 5]
+      },
+      methods: {
+        getJson: function() {
+          this.pages.lp1 = ''; //get json
+        }
+      }
+    });
+  </script>
+</html>
