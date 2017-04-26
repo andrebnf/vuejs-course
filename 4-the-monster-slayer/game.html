@@ -54,12 +54,12 @@
         font-weight: bold;
       }
 
-      .red {
+      .player-turn {
         background-color: #ffb4b4;
         color: red;
       }
 
-      .blue {
+      .monster-turn {
         background-color: lightblue;
         color: blue;
       }
@@ -75,17 +75,17 @@
       <div class="player-container">
         <h2>You</h2>
         <div class="health-bar--wrapper">
-          <div class="health-bar--inner" :style="{width: playerLife + '%'}">{{ playerLife }}</div>
+          <div class="health-bar--inner" :style="{width: playerHealth + '%'}">{{ playerHealth }}</div>
         </div>
       </div>
       <div class="player-container">
         <h2>Monster</h2>
         <div class="health-bar--wrapper">
-          <div class="health-bar--inner" :style="{width: monsterLife + '%'}">{{ monsterLife }}</div>
+          <div class="health-bar--inner" :style="{width: monsterHealth + '%'}">{{ monsterHealth }}</div>
         </div>
       </div>
       <div class="controls">
-        <div v-if="state === 'stopped'">
+        <div v-if="!isPlaying">
           <button @click="startGame">Start new game</button>
         </div>
         <div v-else>
@@ -95,9 +95,9 @@
           <button id="btn-giveup" @click="giveUp">Give up</button>
         </div>
       </div>
-      <div class="logs">
+      <div class="logs" v-if="logs.length > 0">
         <div class="log" v-for="log in logs">
-          <div :class="log.class">{{ log.message }}</div>
+          <div :class="{'player-turn': log.isPlayer, 'monster-turn': !log.isPlayer}">{{ log.message }}</div>
         </div>
       </div>
     </div>
@@ -107,41 +107,69 @@
     new Vue({
       el: '#app',
       data: {
-        playerLife: 100,
-        monsterLife: 100,
-        state: 'stopped',
+        playerHealth: 100,
+        monsterHealth: 100,
+        isPlaying: false,
         logs: [] // [{ message: 'Monster hits player for 6' , color: 'red' }, ...]
       },
       methods: {
         startGame: function() {
-          this.state = 'playing';
+          this.isPlaying = true;
+          this.playerHealth = 100;
+          this.monsterHealth = 100;
+          this.logs = [];
         },
         attack: function() {
           var playerPower = random(7, 15),
             monsterPower = random(4, 10);
 
-          this.monsterLife = this.monsterLife - playerPower;
-          this.playerLife = this.playerLife - monsterPower;
-          this.logs.push({message: 'Player hits Monster for ' + playerPower, class: 'blue'})
-          this.logs.push({message: 'Monster hits Player for ' + monsterPower, class: 'red'})
+          this.battle(playerPower, monsterPower);
         },
         specialAttack: function() {
           var playerPower = random(10, 20),
             monsterPower = random(4, 10);
 
-          this.monsterLife = this.monsterLife - playerPower;
-          this.playerLife = this.playerLife - monsterPower;
-          this.logs.push({message: 'Player hits Monster for ' + playerPower, class: 'blue'})
-          this.logs.push({message: 'Monster hits Player for ' + monsterPower, class: 'red'})
+          this.battle(playerPower, monsterPower);
         },
         heal: function() {
           var monsterPower = random(4, 10);
-          this.logs.push({message: 'Player heals himself for 10', class: 'blue'});
-          this.playerLife = Math.min(this.playerLife - monsterPower + 10, 100);
-          this.logs.push({message: 'Monster hits Player for ' + monsterPower, class: 'red'})
+          this.logs.unshift({message: 'Player heals himself for 10', class: 'blue'});
+          this.playerHealth = Math.min(this.playerHealth - monsterPower + 10, 100);
+          this.logMonsterAttack(monsterPower);
         },
         giveUp: function() {
+          this.isPlaying = false;
+        },
+        battle: function(playerPower, monsterPower) {
+          this.monsterHealth = this.monsterHealth - playerPower;
+          this.logPlayerAttack(playerPower);
 
+          if (this.checkWin()) { return; }
+
+          this.playerHealth = this.playerHealth - monsterPower;
+          this.logMonsterAttack(monsterPower);
+
+          this.checkWin();
+        },
+        logMonsterAttack: function(monsterPower) {
+          this.logs.unshift({message: 'Monster hits Player for ' + monsterPower, isPlayer: false});
+        },
+        logPlayerAttack: function(playerPower) {
+          this.logs.unshift({message: 'Player hits Monster for ' + playerPower, isPlayer: true});
+        },
+        checkWin: function() {
+          if (this.monsterHealth <= 0) {
+            if (confirm('You won! New Game?')) {
+              this.startGame();
+            }
+            return true;
+          } else if(this.playerHealth <= 0) {
+            if (confirm('You lost! New Game?')) {
+              this.startGame();
+            }
+            return true;
+          }
+          return false;
         }
       }
     });
