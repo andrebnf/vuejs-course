@@ -1,5 +1,5 @@
 <template>
-  <my-cmp></my-cmp>
+  <app-servers></app-servers>
 </template>
 
 <script>
