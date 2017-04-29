@@ -1,5 +1,5 @@
 <template>
-  <h1>Hello World</h1>
+  <my-cmp></my-cmp>
 </template>
 
 <script>
