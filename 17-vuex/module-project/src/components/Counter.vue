@@ -1,19 +1,16 @@
 <template>
-    <div>
-        <button class="btn btn-primary" @click="increment">Increment</button>
-        <button class="btn btn-primary" @click="decrement">Decrement</button>
-    </div>
+  <div>
+    <button class="btn btn-primary" @click="asyncIncrement({ by: 50, duration: 500 })">Increment</button>
+    <button class="btn btn-primary" @click="asyncDecrement({ by: 50, duration: 500 })">Decrement</button>
+  </div>
 </template>
 
 <script>
-    export default {
-        methods: {
-            increment() {
-                this.$emit('updated', 1);
-            },
-            decrement() {
-                this.$emit('updated', -1);
-            }
-        }
-    }
+import { mapActions } from 'vuex';
+
+export default {
+  methods: {
+    ...mapActions(['asyncIncrement', 'asyncDecrement'])
+  }
+}
 </script>
